@@ -8,22 +8,21 @@ import numpy as np
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
+import xarray as xr
+
 
 def readanemofile(fname):
     """
     Reads the dates and wind (U, V) from files 
     that have been prepared by Bastien Alonzo. 
     """
-    f = open(fname)
-    b = f.readlines()
-    tt = []; u10=[];v10=[]
-    for ll in b[1:]:
-        lls = ll.strip().split(',')
-        if lls[1]!='nan':
-            tt.append(datetime.strptime(lls[0],'%Y-%m-%d %H:%M:%S'))
-            u10.append(eval(lls[1]))
-            v10.append(eval(lls[2]))
-    return tt,u10,v10
+    ds = xr.open_dataset(fname)
+
+    tt = ds['time_bnds'].values  # Modify 'time' if the time variable has a different name
+    u = ds['u'].values    # Modify 'U' if the U wind variable has a different name
+    v = ds['v'].values    # Modify 'V' if the V wind variable has a different name
+
+    return tt,u,v
 
 def dfreadanemo(fname):
 	tt,u10,v10 = readanemofile(fname)
